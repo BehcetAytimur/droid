@@ -42,3 +42,42 @@ if __name__ == "__main__":
     x = get_user_input()
     prediction = make_prediction(x)
     print_prediction(prediction)
+
+import cv2
+import numpy as np
+# Load the Haar Cascade classifier for detecting faces
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+# Define a function to detect faces in an image
+def detect_faces(image):
+    # Convert the image to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Detect faces in the image
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    # Draw a rectangle around each face
+    for (x, y, w, h) in faces:
+        cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+    return image
+# Define a function to track faces in a video
+def track_faces(video):
+    # Create a VideoCapture object
+    cap = cv2.VideoCapture(video)
+    # Loop over the frames in the video
+    while True:
+        # Read the next frame
+        ret, frame = cap.read()
+        # If the frame is empty, break out of the loop
+        if not ret:
+            break
+        # Detect faces in the frame
+        frame = detect_faces(frame)
+        # Display the frame
+        cv2.imshow('Faces', frame)
+        # Wait for a key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    # Release the VideoCapture object
+    cap.release()
+    # Destroy all windows
+    cv2.destroyAllWindows()
+# Start the face tracking program
+track_faces('video.mp4')
